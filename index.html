@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-cursor="ring">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -29,6 +29,9 @@
       height: 100dvh;
       color: #fff;
       font-family: Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .content {
       text-align: center;
@@ -77,6 +80,7 @@
       font-weight: 500;
       text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
       opacity: 0.6;
+      white-space: nowrap;
     }
     .arrow {
       display: inline-block;
@@ -84,6 +88,93 @@
       font-weight: 300;
       opacity: 0.75;
       transform: translateY(-0.05em);
+    }
+
+    /* ---------- Emoji burst ----------
+       One emoji per click, cycling through the list in script.
+       Pops from the pointer, drifts up a touch, and fades. */
+    .burst {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 50;
+      font-size: 30px;      /* about 1.5x the pointer */
+      line-height: 1;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: burst 850ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      --dx: 0px;
+    }
+    @keyframes burst {
+      0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0; }
+      18%  { opacity: 1; }
+      45%  { transform: translate(calc(-50% + var(--dx) * 0.6), calc(-50% - 30px)) scale(1.06); }
+      100% { transform: translate(calc(-50% + var(--dx)), calc(-50% - 54px)) scale(1); opacity: 0; }
+    }
+
+    /* ---------- Cursor styles ----------
+       Switch with the data-cursor attribute on <html>: ring | pixel | crosshair */
+
+    /* ring: hollow circle with a dot that trails the pointer, breathes gently */
+    html.ring-on body { cursor: none; }
+    #cursor {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 22px;
+      height: 22px;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #cursor.on { opacity: 1; }
+    #cursor::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      animation: breathe 2.6s ease-in-out infinite;
+      transition: transform 0.15s ease;
+    }
+    #cursor::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 4px;
+      height: 4px;
+      margin: -2px 0 0 -2px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    #cursor.down::before {
+      animation: none;
+      transform: scale(0.72);
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.14); }
+    }
+
+    /* pixel: classic 1-bit arrow, inverted for the black background */
+    html[data-cursor="pixel"] body {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v13l3.5-3.5L7 15l2-1-2.5-4.5H12z' fill='%23fff' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E") 1 1, auto;
+    }
+
+    /* crosshair: thin HUD-style reticle with an open center */
+    html[data-cursor="crosshair"] body {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg stroke='%23fff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M14 2v7M14 19v7M2 14h7M19 14h7'/%3E%3C/g%3E%3Ccircle cx='14' cy='14' r='1.5' fill='%23fff'/%3E%3C/svg%3E") 14 14, crosshair;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .burst { animation: burstFade 500ms ease-out forwards; }
+      @keyframes burstFade {
+        0%   { transform: translate(-50%, -50%); opacity: 1; }
+        100% { transform: translate(-50%, -50%); opacity: 0; }
+      }
+      #cursor::before { animation: none; }
     }
   </style>
 </head>
@@ -95,5 +186,58 @@
     </div>
   </div>
   <div class="signature">Zo 🚀 NYC<span class="arrow">→</span>PHX 🌎 2026</div>
+  <div id="cursor" aria-hidden="true"></div>
+
+  <script>
+    (function () {
+      // ---- Emoji burst: one per click, cycles in order ----
+      var EMOJI = ['🗽', '🏜️', '🌅', '🚀', '🧑‍💻', '🎬', '🎞️', '🏋️', '🥾', '🏔️', '🧠', '🌎'];
+      var next = 0;
+
+      function burst(x, y) {
+        var el = document.createElement('span');
+        el.className = 'burst';
+        el.textContent = EMOJI[next++ % EMOJI.length];
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.setProperty('--dx', (Math.random() * 20 - 10).toFixed(1) + 'px');
+        el.addEventListener('animationend', function () { el.remove(); });
+        document.body.appendChild(el);
+      }
+
+      window.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        burst(e.clientX, e.clientY);
+      });
+
+      // ---- Ring cursor: only on devices with a real pointer ----
+      var html = document.documentElement;
+      var ring = document.getElementById('cursor');
+      var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+      if (html.dataset.cursor === 'ring' && finePointer) {
+        html.classList.add('ring-on');
+        var tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty;
+
+        window.addEventListener('pointermove', function (e) {
+          tx = e.clientX; ty = e.clientY;
+          ring.classList.add('on');
+        });
+        window.addEventListener('pointerdown', function () { ring.classList.add('down'); });
+        window.addEventListener('pointerup',   function () { ring.classList.remove('down'); });
+        document.addEventListener('mouseleave', function () { ring.classList.remove('on'); });
+        document.addEventListener('mouseenter', function () { ring.classList.add('on'); });
+
+        (function follow() {
+          x += (tx - x) * 0.35;
+          y += (ty - y) * 0.35;
+          ring.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%)';
+          requestAnimationFrame(follow);
+        })();
+      } else {
+        ring.remove();
+      }
+    })();
+  </script>
 </body>
 </html>
