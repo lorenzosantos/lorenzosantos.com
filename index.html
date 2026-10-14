@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-cursor="ring">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -133,66 +133,54 @@
       to   { transform: scale(1); }
     }
 
-    /* ---------- Cursor styles ----------
-       Switch with the data-cursor attribute on <html>: ring | pixel | crosshair */
-
-    /* ring: hollow circle with a dot that trails the pointer, breathes gently */
-    html.ring-on body { cursor: none; }
-    #cursor {
+    /* ---------- Cursor ----------
+       Three layers, only on devices with a real pointer:
+       1. a 1-bit pixel-art arrow as the system cursor (24x36, tip at 0,0)
+       2. a faded "next up" emoji riding beside the arrow
+       3. a dim spotlight that follows with some lag, under the content */
+    @media (hover: hover) and (pointer: fine) {
+      body {
+        cursor: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2724%27%20height=%2736%27%20viewBox=%270%200%2012%2018%27%20shape-rendering=%27crispEdges%27%3E%3Cg%20fill=%27%23000%27%3E%3Crect%20x=%270%27%20y=%270%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%271%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%272%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%272%27%20y=%272%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%273%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%273%27%20y=%273%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%274%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%274%27%20y=%274%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%275%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%275%27%20y=%275%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%276%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%276%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%277%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%277%27%20y=%277%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%278%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%278%27%20y=%278%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%279%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%279%27%20y=%279%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%2710%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2710%27%20width=%275%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%2711%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%273%27%20y=%2711%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2711%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%2712%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%272%27%20y=%2712%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%274%27%20y=%2712%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%277%27%20y=%2712%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%2713%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%274%27%20y=%2713%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%277%27%20y=%2713%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%270%27%20y=%2714%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%275%27%20y=%2714%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%278%27%20y=%2714%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%275%27%20y=%2715%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%278%27%20y=%2715%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2716%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%278%27%20y=%2716%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2717%27%20width=%272%27%20height=%271%27/%3E%3C/g%3E%3Cg%20fill=%27%23fff%27%3E%3Crect%20x=%271%27%20y=%272%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%273%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%274%27%20width=%273%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%275%27%20width=%274%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%276%27%20width=%275%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%277%27%20width=%276%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%278%27%20width=%277%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%279%27%20width=%278%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%2710%27%20width=%275%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%2711%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%274%27%20y=%2711%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%271%27%20y=%2712%27%20width=%271%27%20height=%271%27/%3E%3Crect%20x=%275%27%20y=%2712%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%275%27%20y=%2713%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2714%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%276%27%20y=%2715%27%20width=%272%27%20height=%271%27/%3E%3Crect%20x=%277%27%20y=%2716%27%20width=%271%27%20height=%271%27/%3E%3C/g%3E%3C/svg%3E") 0 0, auto;
+      }
+    }
+    .content, .signature { position: relative; z-index: 2; }
+    .signature { position: fixed; }
+    #ghost, #spot {
       position: fixed;
       left: 0;
       top: 0;
-      width: 22px;
-      height: 22px;
-      z-index: 100;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.25s ease;
+      display: none;
+      will-change: transform;
     }
-    #cursor.on { opacity: 1; }
-    #cursor::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border: 1.5px solid rgba(255, 255, 255, 0.9);
+    #ghost {
+      z-index: 100;
+      font-size: 18px;
+      line-height: 1;
+      opacity: 0.5;
+      filter: saturate(0.85);
+    }
+    #ghost.swap { animation: ghostSwap 320ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes ghostSwap {
+      0%   { transform: scale(0.3); opacity: 0; }
+      100% { transform: scale(1); opacity: 0.5; }
+    }
+    #spot {
+      z-index: 1;
+      width: 260px;
+      height: 260px;
+      margin: -130px 0 0 -130px;
       border-radius: 50%;
-      animation: breathe 2.6s ease-in-out infinite;
-      transition: transform 0.15s ease;
-    }
-    #cursor::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 4px;
-      height: 4px;
-      margin: -2px 0 0 -2px;
-      border-radius: 50%;
-      background: #fff;
-    }
-    #cursor.down::before {
-      animation: none;
-      transform: scale(0.72);
-    }
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); }
-      50%      { transform: scale(1.14); }
-    }
-
-    /* pixel: classic 1-bit arrow, inverted for the black background */
-    html[data-cursor="pixel"] body {
-      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M1 1v13l3.5-3.5L7 15l2-1-2.5-4.5H12z' fill='%23fff' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E") 1 1, auto;
-    }
-
-    /* crosshair: thin HUD-style reticle with an open center */
-    html[data-cursor="crosshair"] body {
-      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg stroke='%23fff' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M14 2v7M14 19v7M2 14h7M19 14h7'/%3E%3C/g%3E%3Ccircle cx='14' cy='14' r='1.5' fill='%23fff'/%3E%3C/svg%3E") 14 14, crosshair;
+      background: radial-gradient(circle,
+        rgba(255, 255, 255, 0.11) 0%,
+        rgba(255, 255, 255, 0.045) 38%,
+        rgba(255, 255, 255, 0) 70%);
     }
 
     @media (prefers-reduced-motion: reduce) {
       .burst { animation: rise 900ms linear forwards, fade 900ms linear forwards; --dx: 0px; --dy: 0px; }
       .burst > span { animation: none; }
-      #cursor::before { animation: none; }
+      #ghost.swap { animation: none; }
     }
   </style>
 </head>
@@ -204,7 +192,8 @@
     </div>
   </div>
   <div class="signature">Zo 🚀 NYC<span class="arrow">→</span>PHX 🌎 2026</div>
-  <div id="cursor" aria-hidden="true"></div>
+  <div id="spot" aria-hidden="true"></div>
+  <div id="ghost" aria-hidden="true"></div>
 
   <script>
     (function () {
@@ -231,32 +220,39 @@
         burst(e.clientX, e.clientY);
       });
 
-      // ---- Ring cursor: only on devices with a real pointer ----
-      var html = document.documentElement;
-      var ring = document.getElementById('cursor');
+      // ---- Ghost + spotlight: only on devices with a real pointer ----
+      var ghost = document.getElementById('ghost');
+      var spot = document.getElementById('spot');
       var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-      if (html.dataset.cursor === 'ring' && finePointer) {
-        html.classList.add('ring-on');
-        var tx = innerWidth / 2, ty = innerHeight / 2, x = tx, y = ty;
+      function setGhost(animate) {
+        ghost.textContent = EMOJI[next % EMOJI.length];
+        if (animate) { ghost.classList.remove('swap'); void ghost.offsetWidth; ghost.classList.add('swap'); }
+      }
+
+      if (finePointer) {
+        setGhost(false);
+        var tx = innerWidth / 2, ty = innerHeight / 2;
+        var gx = tx, gy = ty, sx = tx, sy = ty, seen = false;
 
         window.addEventListener('pointermove', function (e) {
           tx = e.clientX; ty = e.clientY;
-          ring.classList.add('on');
+          if (!seen) { seen = true; ghost.style.display = 'block'; spot.style.display = 'block'; }
         });
-        window.addEventListener('pointerdown', function () { ring.classList.add('down'); });
-        window.addEventListener('pointerup',   function () { ring.classList.remove('down'); });
-        document.addEventListener('mouseleave', function () { ring.classList.remove('on'); });
-        document.addEventListener('mouseenter', function () { ring.classList.add('on'); });
+        window.addEventListener('pointerdown', function () { setGhost(true); });
+        document.addEventListener('mouseleave', function () { ghost.style.display = 'none'; spot.style.display = 'none'; });
+        document.addEventListener('mouseenter', function () { if (seen) { ghost.style.display = 'block'; spot.style.display = 'block'; } });
 
         (function follow() {
-          x += (tx - x) * 0.35;
-          y += (ty - y) * 0.35;
-          ring.style.transform = 'translate(' + x + 'px,' + y + 'px) translate(-50%,-50%)';
+          gx += (tx - gx) * 0.35; gy += (ty - gy) * 0.35;   // ghost: slight lag
+          sx += (tx - sx) * 0.18; sy += (ty - sy) * 0.18;   // spotlight: more lag
+          ghost.style.transform = 'translate3d(' + (gx + 20) + 'px,' + (gy + 26) + 'px,0)';
+          spot.style.transform  = 'translate3d(' + sx + 'px,' + sy + 'px,0)';
           requestAnimationFrame(follow);
         })();
       } else {
-        ring.remove();
+        ghost.remove();
+        spot.remove();
       }
     })();
   </script>
