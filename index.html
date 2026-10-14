@@ -92,26 +92,45 @@
 
     /* ---------- Emoji burst ----------
        One emoji per click, cycling through the list in script.
-       Pops from the pointer, drifts up a touch, and fades. */
+       Outer element: one uninterrupted rise + fade on the compositor.
+       Inner glyph: a short pop at the start, then no more scaling,
+       so the emoji is never re-rasterized mid-flight. */
     .burst {
       position: fixed;
       left: 0;
       top: 0;
       z-index: 50;
-      font-size: 30px;      /* about 1.5x the pointer */
-      line-height: 1;
+      width: 30px;          /* about 1.5x the pointer */
+      height: 30px;
+      margin: -15px 0 0 -15px;
+      font-size: 30px;
+      line-height: 30px;
+      text-align: center;
       pointer-events: none;
       will-change: transform, opacity;
-      animation: burst 1700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
       --dx: 0px;            /* set per burst: one of three lanes */
       --dy: -120px;         /* rises four emoji lengths */
+      animation:
+        rise 1700ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+        fade 1700ms linear forwards;
     }
-    @keyframes burst {
-      0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0; }
-      10%  { opacity: 1; }
-      30%  { transform: translate(calc(-50% + var(--dx) * 0.35), calc(-50% + var(--dy) * 0.35)) scale(1.06); }
+    .burst > span {
+      display: block;
+      animation: pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes rise {
+      from { transform: translate3d(0, 0, 0); }
+      to   { transform: translate3d(var(--dx), var(--dy), 0); }
+    }
+    @keyframes fade {
+      0%   { opacity: 0; }
+      8%   { opacity: 1; }
       55%  { opacity: 1; }
-      100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1); opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes pop {
+      from { transform: scale(0.4); }
+      to   { transform: scale(1); }
     }
 
     /* ---------- Cursor styles ----------
@@ -171,11 +190,8 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .burst { animation: burstFade 900ms ease-out forwards; }
-      @keyframes burstFade {
-        0%   { transform: translate(-50%, -50%); opacity: 1; }
-        100% { transform: translate(-50%, -50%); opacity: 0; }
-      }
+      .burst { animation: rise 900ms linear forwards, fade 900ms linear forwards; --dx: 0px; --dy: 0px; }
+      .burst > span { animation: none; }
       #cursor::before { animation: none; }
     }
   </style>
@@ -198,13 +214,15 @@
       var next = 0;
 
       function burst(x, y) {
-        var el = document.createElement('span');
+        var el = document.createElement('div');
         el.className = 'burst';
-        el.textContent = EMOJI[next++ % EMOJI.length];
+        var glyph = document.createElement('span');
+        glyph.textContent = EMOJI[next++ % EMOJI.length];
+        el.appendChild(glyph);
         el.style.left = x + 'px';
         el.style.top = y + 'px';
         el.style.setProperty('--dx', LANES[Math.floor(Math.random() * LANES.length)]);
-        el.addEventListener('animationend', function () { el.remove(); });
+        el.addEventListener('animationend', function (ev) { if (ev.animationName === 'rise') el.remove(); });
         document.body.appendChild(el);
       }
 
